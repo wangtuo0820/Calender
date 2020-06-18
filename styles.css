@@ -1,0 +1,41 @@
+table{
+    text-align: center;
+    table-layout: fixed;
+    width: 95%;
+  }
+  h1{
+    text-align: center;
+    margin: auto;
+    color:midnightblue;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  body{
+    border: darkred,solid,2px;
+    border-width: 5px;
+  }
+  #main-form{
+    border:black,solid,2px;
+    text-align: center !important;
+    width:fit-content;
+    margin: auto;
+  }
+
+  .sun{
+    margin-top:40px;
+    color: red;
+    font-size: xx-large;
+  } 
+  .sun:hover{
+    background-color: lightsalmon;
+    color: white;
+  } 
+  .date{
+    color:black;
+    font-size: xx-large;
+    vertical-align: middle;
+  }
+   .date:hover{
+    color:white;
+    background-color: lightgreen;
+  }  
