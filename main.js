@@ -13,6 +13,9 @@ function Isleap(year) //function to check leap year
 var month=1;  //default month 
 var year=2020;  // default year
 
+var is_start=true;
+var start_date, end_date;
+
 
 
 function showcalender(month,year)   //function to show the calender 
@@ -75,6 +78,7 @@ function showcalender(month,year)   //function to show the calender
   {
       document.getElementById((cells).toString()).innerHTML=last_monthdays--;
       document.getElementById((cells).toString()).style.color="lightgrey";       
+      document.getElementById((cells).toString()).style.background="";       
   }
 
 
@@ -86,76 +90,192 @@ function showcalender(month,year)   //function to show the calender
       if((first_date_day+d)%7==0)
       {
         document.getElementById((first_date_day+d).toString()).style.color="red"; 
+        document.getElementById((first_date_day+d).toString()).style.background=""; 
       }
       else
       {
         document.getElementById((first_date_day+d).toString()).style.color="black"; 
+        document.getElementById((first_date_day+d).toString()).style.background=""; 
+      }
+
+    // 保留选择的日期
+      if(start_date && end_date)
+      {
+          cur_date = new Date([year, month, d+1].join("/"))
+          if(cur_date >= start_date && cur_date <= end_date)
+          {
+            console.log(d, first_date_day)
+            document.getElementById((first_date_day+d).toString()).style.background="lightgreen"; 
+          }
       }
   }
-
 
   count=1;
   for(let cells=first_date_day+monthdays[month];cells<=41;cells++) //for filling next month details
   {
       document.getElementById((cells).toString()).innerHTML=count++;
       document.getElementById((cells).toString()).style.color="lightgrey";       
+      document.getElementById((cells).toString()).style.background="";       
   }
   }
 
 
 showcalender(month,year);  //function is called with default values of month and year for the first time
 
+function addlistener()
+{
+    d = document.getElementsByClassName("date");
+    for(i = 0; i < d.length; i++)
+    {
+        d[i].addEventListener('click', click_recall);
+        d[i].addEventListener('mouseover', mouseover_recall);
+    }
+
+    d = document.getElementsByClassName("sun");
+    for(i = 0; i < d.length; i++)
+    {
+        d[i].addEventListener('click', click_recall);
+        d[i].addEventListener('mouseover', mouseover_recall);
+    }
+}
+
+addlistener();
 
 
 
 function nextmonth() //function for next month button
 {
-  if (month==12 && year==1000000)
-  {
-    document.getElementById("next").disabled=true;
-  }
-  else
-  {
-    if(month==12)
+    if (month==12 && year==1000000)
     {
-      month=1;
-      year++;
+      document.getElementById("next").disabled=true;
     }
     else
     {
-      month++;
+      if(month==12)
+      {
+        month=1;
+        year++;
+      }
+      else
+      {
+        month++;
+      }
     }
-  }
-  document.getElementById("monthmenu").value=month;
-  document.getElementById("year").value=year;
-  document.getElementById("heading").innerHTML=monthnames[month]+"  "+year;
-  showcalender(month,year);
+    document.getElementById("monthmenu").value=month;
+    document.getElementById("year").value=year;
+    document.getElementById("heading").innerHTML=monthnames[month]+"  "+year;
+    showcalender(month,year);
+    
 }
 
+function click_recall()
+{
+    day = event.target.innerHTML
+    // window.alert([year, "年", month, "月", day, "日"].join(" "));
+
+    let style_color = document.getElementById(event.target.id).style.color 
+    if(style_color == 'lightgrey')
+    {
+        if(event.target.id > 27)
+            nextmonth()
+        if(event.target.id < 14)
+            previousmonth()
+        return
+    }
+
+    if(is_start)
+    {
+        start_date = new Date([year, month, day].join("/"))
+        is_start = !is_start;
+        end_date = null
+    }
+    else
+    {
+        end_date = new Date([year, month, day].join("/"))
+        if(end_date < start_date)
+        {
+            window.alert("The start date must be before the end date.");
+        }
+        else
+        {
+            window.alert(start_date.toLocaleDateString() + " to "+end_date.toLocaleDateString() + " selected")
+        }
+        is_start = !is_start;
+
+    }
+}
+
+function mouseover_recall()
+{
+    if(document.getElementById(event.target.id).style.color == 'lightgrey')
+        return;
+
+
+
+    cur_day = event.target.innerHTML;
+    cur_date = new Date([year, month, cur_day].join("/"))
+    cur_id = event.target.id;
+
+    if(!is_start && start_date)  // 已经开始
+    {
+        // 保证选中区域跟随鼠标
+        d = document.getElementsByClassName('date');
+        for(i = 0; i < d.length; i++)
+        {
+            d[i].style.background = "";
+        }
+        d = document.getElementsByClassName('sun');
+        for(i = 0; i < d.length; i++)
+        {
+            d[i].style.background = "";
+        }
+
+
+        while(start_date <= cur_date)
+        {
+            document.getElementById(cur_id).style.background = "lightgreen";
+            if(cur_id == 0)
+                break;
+
+            next_id = (Number(cur_id) - 1).toString();
+            next_day = document.getElementById(next_id).innerHTML;
+
+            if(Number(next_day) > Number(cur_day))
+                break;
+
+            next_date = new Date([year, month, next_day].join("/"))
+            cur_date = next_date;
+            cur_id = next_id;
+            cur_day = next_day;
+        }
+
+    }
+}
 
 
 function previousmonth() //function for previous month button
 {
-  if (month==1 && year==1800)
-  {
-    document.getElementById("previous").disabled=true;
-  }
-  else
-  {
-    if(month==1)
+    if (month==1 && year==1800)
     {
-      month=12;
-      year--;
+      document.getElementById("previous").disabled=true;
     }
     else
     {
-      month--;
+      if(month==1)
+      {
+        month=12;
+        year--;
+      }
+      else
+      {
+        month--;
+      }
     }
-  }
-  document.getElementById("monthmenu").value=month;
-  document.getElementById("year").value=year;
-  document.getElementById("heading").innerHTML=monthnames[month]+"  "+year;
-  showcalender(month,year);
+    document.getElementById("monthmenu").value=month;
+    document.getElementById("year").value=year;
+    document.getElementById("heading").innerHTML=monthnames[month]+"  "+year;
+    showcalender(month,year);
+
 }
 
 
